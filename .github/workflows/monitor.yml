@@ -1,0 +1,57 @@
+name: "wplace.live — Moniteur anti-grief"
+
+on:
+  # Cron toutes les 5 minutes
+  schedule:
+    - cron: "*/5 * * * *"
+  # Déclenchement manuel depuis l'onglet Actions
+  workflow_dispatch:
+
+# Permissions nécessaires pour committer l'image de référence
+permissions:
+  contents: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Récupérer le code (avec l'image de référence si elle existe)
+      - name: "📦 Checkout du dépôt"
+        uses: actions/checkout@v4
+
+      # 2. Installer Python
+      - name: "🐍 Installer Python 3.12"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 3. Installer les dépendances
+      - name: "📚 Installer les dépendances"
+        run: pip install -r requirements.txt
+
+      # 4. Lancer le script de surveillance
+      - name: "🔍 Lancer le moniteur"
+        env:
+          # Secret (webhook Discord)
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          # Variables de dépôt (optionnelles, le code gère les ""  vides)
+          TILE_X: ${{ vars.TILE_X }}
+          TILE_Y: ${{ vars.TILE_Y }}
+          ZONE_X_MIN: ${{ vars.ZONE_X_MIN }}
+          ZONE_X_MAX: ${{ vars.ZONE_X_MAX }}
+          ZONE_Y_MIN: ${{ vars.ZONE_Y_MIN }}
+          ZONE_Y_MAX: ${{ vars.ZONE_Y_MAX }}
+          CHANGE_THRESHOLD: ${{ vars.CHANGE_THRESHOLD }}
+          COLOR_TOLERANCE: ${{ vars.COLOR_TOLERANCE }}
+        run: python monitor.py
+
+      # 5. Committer l'image de référence mise à jour
+      - name: "💾 Committer la référence mise à jour"
+        run: |
+          git config user.name "wplace-monitor-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add reference.png
+          # --allow-empty évite l'erreur si rien n'a changé
+          git diff --cached --quiet || git commit -m "🤖 Mise à jour de la référence [skip ci]"
+          git push
