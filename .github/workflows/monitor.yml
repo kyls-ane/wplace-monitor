@@ -51,8 +51,20 @@ jobs:
         run: |
           git config user.name "wplace-monitor-bot"
           git config user.email "bot@users.noreply.github.com"
+
+          # Récupérer les derniers changements AVANT de committer
+          # pour éviter le "rejected - fetch first"
+          git fetch origin main
+          git reset --soft origin/main
+
           git add reference.png
-          # --allow-empty évite l'erreur si rien n'a changé
-          git diff --cached --quiet || git commit -m "🤖 Mise à jour de la référence [skip ci]"
-          git pull --rebase origin main
-          git push
+          git diff --cached --quiet && echo "Rien à committer." && exit 0
+
+          git commit -m "🤖 Mise à jour de la référence [skip ci]"
+
+          # Push avec 3 tentatives en cas de conflit de dernière seconde
+          for i in 1 2 3; do
+            git push origin main && break
+            echo "⚠️ Push échoué (tentative $i/3), on pull et on réessaie..."
+            git pull --rebase origin main
+          done
