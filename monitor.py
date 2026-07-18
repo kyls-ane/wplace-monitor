@@ -34,7 +34,7 @@ ZONE_Y_MIN = int(os.environ.get("ZONE_Y_MIN") or "0")
 ZONE_Y_MAX = int(os.environ.get("ZONE_Y_MAX") or "999")
 
 # Seuil de détection (% de pixels modifiés pour déclencher l'alerte)
-CHANGE_THRESHOLD = float(os.environ.get("CHANGE_THRESHOLD") or "1.0")
+CHANGE_THRESHOLD = float(os.environ.get("CHANGE_THRESHOLD") or "0.5")
 
 # Tolérance de couleur par canal (0-255) pour ignorer le bruit
 # Un pixel est considéré "changé" si au moins un canal RGB diffère
