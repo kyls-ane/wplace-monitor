@@ -1,4 +1,4 @@
-# 🛡️ wplace.live — Moniteur anti-grief
+#  wplace.live — Moniteur anti-grief
 
 Bot de surveillance automatique pour [wplace.live](https://wplace.live).
 Il surveille une zone de pixel art et t'envoie une alerte Discord dès que
@@ -8,7 +8,7 @@ quelqu'un la modifie de manière significative (griefing).
 
 ---
 
-## 📁 Structure du projet
+##  Structure du projet
 
 | Fichier | Rôle |
 |---|---|
@@ -20,7 +20,7 @@ quelqu'un la modifie de manière significative (griefing).
 
 ---
 
-## 🚀 Guide d'installation pas à pas
+##  Guide d'installation pas à pas
 
 ### Étape 1 — Créer un webhook Discord
 
@@ -44,7 +44,7 @@ Ouvre un terminal dans le dossier du projet (`wplace-monitor/`) et exécute :
 ```bash
 git init
 git add .
-git commit -m "🚀 Premier commit — moniteur wplace.live"
+git commit -m " Premier commit — moniteur wplace.live"
 git branch -M main
 git remote add origin https://github.com/TON_PSEUDO/wplace-monitor.git
 git push -u origin main
@@ -78,7 +78,7 @@ Si tu veux modifier la zone surveillée ou le seuil **sans toucher au code** :
 | `CHANGE_THRESHOLD` | `3.0` | Seuil de détection (%) |
 | `COLOR_TOLERANCE` | `10` | Tolérance de couleur (0-255) |
 
-> ⚠️ **Tu n'es pas obligé de créer ces variables.** Si elles n'existent pas (ou sont vides), le code utilise les valeurs par défaut indiquées ci-dessus.
+>  **Tu n'es pas obligé de créer ces variables.** Si elles n'existent pas (ou sont vides), le code utilise les valeurs par défaut indiquées ci-dessus.
 
 ### Étape 6 — Activer le workflow et premier test
 
@@ -88,11 +88,11 @@ Si tu veux modifier la zone surveillée ou le seuil **sans toucher au code** :
 4. Clique le bouton **"Run workflow"** → **"Run workflow"** (branche `main`).
 5. Attends ~30 secondes, puis regarde les logs du run.
 6. Au **premier run** : pas d'alerte (il n'y a pas encore de référence). L'image `reference.png` sera committée automatiquement.
-7. Au **deuxième run** (5 min plus tard ou re-run manuel) : comparaison effective. Si quelqu'un a modifié la zone, tu reçois l'alerte Discord ! 🎉
+7. Au **deuxième run** (5 min plus tard ou re-run manuel) : comparaison effective. Si quelqu'un a modifié la zone, tu reçois l'alerte Discord ! 
 
 ---
 
-## ⚙️ Comment ça marche
+##  Comment ça marche
 
 ```
 ┌─────────────┐     ┌────────────────┐     ┌─────────────────┐
@@ -106,20 +106,20 @@ Si tu veux modifier la zone surveillée ou le seuil **sans toucher au code** :
                                            Non │         │ Oui
                                                ▼         ▼
                                           ┌────────┐ ┌────────────┐
-                                          │  RAS   │ │ 🚨 Discord │
+                                          │  RAS   │ │    Discord │
                                           └────────┘ │  + images  │
                                                      └────────────┘
                                                │         │
                                                ▼         ▼
                                         ┌─────────────────────┐
-                                        │ 💾 Sauvegarder      │
-                                        │ nouvelle référence   │
+                                        │    Sauvegarder      │
+                                        │ nouvelle référence  │
                                         └─────────────────────┘
 ```
 
 ---
 
-## ⚠️ Limites à connaître
+##  Limites à connaître
 
 ### Délai du cron GitHub Actions
 - Le cron GitHub Actions est **indicatif** : `*/5 * * * *` signifie "environ toutes les 5 minutes", mais en pratique GitHub peut ajouter **1 à 15 minutes de délai** en période de forte charge. Ce n'est pas du temps réel.
@@ -140,6 +140,7 @@ Si tu veux modifier la zone surveillée ou le seuil **sans toucher au code** :
 
 ---
 
-## 📜 Licence
+##  Licence
 
-Projet personnel — utilise-le comme tu veux.
+Projet publique — utilise-le comme tu veux.
+Par Kyls-Ane
