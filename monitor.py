@@ -73,15 +73,15 @@ def crop_zone(tile: Image.Image) -> Image.Image:
     return cropped
 
 
-def compare_images(current: Image.Image, reference: Image.Image) -> float:
-    """Compare deux images et retourne le pourcentage de pixels modifiés.
+def compare_images(current: Image.Image, reference: Image.Image) -> tuple[float, int]:
+    """Compare deux images et retourne (pourcentage, nombre de pixels modifiés).
 
     Un pixel est considéré "modifié" si la différence absolue sur au
     moins un canal RGB dépasse COLOR_TOLERANCE.
     """
     if current.size != reference.size:
         print("⚠️  Taille différente → considéré comme 100% de changement")
-        return 100.0
+        return 100.0, current.size[0] * current.size[1]
 
     arr_cur = np.array(current, dtype=np.int16)
     arr_ref = np.array(reference, dtype=np.int16)
@@ -100,11 +100,11 @@ def compare_images(current: Image.Image, reference: Image.Image) -> float:
         f"🔍 Comparaison : {num_changed}/{total} pixels modifiés "
         f"({pct:.2f}%) — seuil = {CHANGE_THRESHOLD}%"
     )
-    return pct
+    return pct, num_changed
 
 
 def send_discord_alert(
-    pct: float, before_img: Image.Image, after_img: Image.Image
+    pct: float, num_changed: int, before_img: Image.Image, after_img: Image.Image
 ) -> None:
     """Envoie une alerte Discord via webhook avec les images avant/après."""
     if not DISCORD_WEBHOOK_URL:
@@ -121,10 +121,11 @@ def send_discord_alert(
     buf_after.seek(0)
 
     # Construire le message
+    mention = "@everyone " if num_changed > 3000 else ""
     message = (
-        f"🚨 **Alerte wplace.live — Griefing détecté !**\n"
-        f"**{pct:.2f}%** des pixels de la zone surveillée ont changé "
-        f"(seuil : {CHANGE_THRESHOLD}%).\n"
+        f"{mention}🚨 **Alerte wplace.live — Griefing détecté !**\n"
+        f"**{num_changed} pixels** ont changé (**{pct:.2f}%** de la zone, "
+        f"seuil : {CHANGE_THRESHOLD}%).\n"
         f"Tuile `({TILE_X}, {TILE_Y})` — Zone "
         f"x=[{ZONE_X_MIN}..{ZONE_X_MAX}], y=[{ZONE_Y_MIN}..{ZONE_Y_MAX}]"
     )
@@ -162,12 +163,12 @@ def main() -> None:
         return
 
     # 3. Comparer
-    pct = compare_images(current_zone, reference_zone)
+    pct, num_changed = compare_images(current_zone, reference_zone)
 
     # 4. Alerter si nécessaire
     if pct >= CHANGE_THRESHOLD:
         print("🚨 Changement significatif détecté → envoi de l'alerte Discord")
-        send_discord_alert(pct, before_img=reference_zone, after_img=current_zone)
+        send_discord_alert(pct, num_changed, before_img=reference_zone, after_img=current_zone)
     else:
         print("✅ Pas de changement significatif — rien à signaler.")
 
