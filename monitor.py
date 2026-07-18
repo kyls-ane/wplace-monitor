@@ -34,12 +34,12 @@ ZONE_Y_MIN = int(os.environ.get("ZONE_Y_MIN") or "0")
 ZONE_Y_MAX = int(os.environ.get("ZONE_Y_MAX") or "999")
 
 # Seuil de détection (% de pixels modifiés pour déclencher l'alerte)
-CHANGE_THRESHOLD = float(os.environ.get("CHANGE_THRESHOLD") or "3.0")
+CHANGE_THRESHOLD = float(os.environ.get("CHANGE_THRESHOLD") or "1.0")
 
 # Tolérance de couleur par canal (0-255) pour ignorer le bruit
 # Un pixel est considéré "changé" si au moins un canal RGB diffère
 # de plus de COLOR_TOLERANCE par rapport à la référence.
-COLOR_TOLERANCE = int(os.environ.get("COLOR_TOLERANCE") or "10")
+COLOR_TOLERANCE = int(os.environ.get("COLOR_TOLERANCE") or "5")
 
 # Webhook Discord (secret, JAMAIS en dur)
 DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL", "")
