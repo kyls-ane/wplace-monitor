@@ -54,4 +54,5 @@ jobs:
           git add reference.png
           # --allow-empty évite l'erreur si rien n'a changé
           git diff --cached --quiet || git commit -m "🤖 Mise à jour de la référence [skip ci]"
+          git pull --rebase origin main
           git push
