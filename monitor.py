@@ -52,7 +52,7 @@ REFERENCE_PATH = os.path.join(
 
 def download_tile() -> Image.Image:
     """Télécharge la tuile depuis le backend wplace.live."""
-    print(f"📥 Téléchargement de la tuile : {TILE_URL}")
+    print(f" Téléchargement de la tuile : {TILE_URL}")
     resp = requests.get(TILE_URL, timeout=30)
     resp.raise_for_status()
     return Image.open(io.BytesIO(resp.content)).convert("RGB")
@@ -67,7 +67,7 @@ def crop_zone(tile: Image.Image) -> Image.Image:
     box = (ZONE_X_MIN, ZONE_Y_MIN, ZONE_X_MAX + 1, ZONE_Y_MAX + 1)
     cropped = tile.crop(box)
     print(
-        f"✂️  Zone découpée : x=[{ZONE_X_MIN}..{ZONE_X_MAX}], "
+        f"  Zone découpée : x=[{ZONE_X_MIN}..{ZONE_X_MAX}], "
         f"y=[{ZONE_Y_MIN}..{ZONE_Y_MAX}] → {cropped.size[0]}×{cropped.size[1]} px"
     )
     return cropped
@@ -80,7 +80,7 @@ def compare_images(current: Image.Image, reference: Image.Image) -> tuple[float,
     moins un canal RGB dépasse COLOR_TOLERANCE.
     """
     if current.size != reference.size:
-        print("⚠️  Taille différente → considéré comme 100% de changement")
+        print("  Taille différente → considéré comme 100% de changement")
         return 100.0, current.size[0] * current.size[1]
 
     arr_cur = np.array(current, dtype=np.int16)
@@ -97,7 +97,7 @@ def compare_images(current: Image.Image, reference: Image.Image) -> tuple[float,
     pct = (num_changed / total) * 100.0
 
     print(
-        f"🔍 Comparaison : {num_changed}/{total} pixels modifiés "
+        f" Comparaison : {num_changed}/{total} pixels modifiés "
         f"({pct:.2f}%) — seuil = {CHANGE_THRESHOLD}%"
     )
     return pct, num_changed
@@ -108,7 +108,7 @@ def send_discord_alert(
 ) -> None:
     """Envoie une alerte Discord via webhook avec les images avant/après."""
     if not DISCORD_WEBHOOK_URL:
-        print("❌ DISCORD_WEBHOOK_URL non défini — alerte ignorée !")
+        print(" DISCORD_WEBHOOK_URL non défini — alerte ignorée !")
         return
 
     # Préparer les images en mémoire (PNG)
@@ -123,7 +123,7 @@ def send_discord_alert(
     # Construire le message
     mention = "@everyone " if num_changed > 3000 else ""
     message = (
-        f"{mention}🚨 **Alerte wplace.live — Griefing détecté !**\n"
+        f"{mention} **Alerte wplace.live — Griefing détecté !**\n"
         f"**{num_changed} pixels** ont changé (**{pct:.2f}%** de la zone, "
         f"seuil : {CHANGE_THRESHOLD}%).\n"
         f"Tuile `({TILE_X}, {TILE_Y})` — Zone "
@@ -141,7 +141,7 @@ def send_discord_alert(
         timeout=30,
     )
     resp.raise_for_status()
-    print("✅ Alerte Discord envoyée !")
+    print(" Alerte Discord envoyée !")
 
 
 def main() -> None:
@@ -152,12 +152,12 @@ def main() -> None:
     # 2. Charger la référence (si elle existe)
     if os.path.isfile(REFERENCE_PATH):
         reference_zone = Image.open(REFERENCE_PATH).convert("RGB")
-        print(f"📂 Référence chargée : {REFERENCE_PATH}")
+        print(f" Référence chargée : {REFERENCE_PATH}")
     else:
         # Premier run : pas de référence, on sauvegarde et on sort
         current_zone.save(REFERENCE_PATH)
         print(
-            "🆕 Aucune référence trouvée — image initiale sauvegardée. "
+            " Aucune référence trouvée — image initiale sauvegardée. "
             "Le prochain run pourra comparer."
         )
         return
@@ -167,19 +167,19 @@ def main() -> None:
 
     # 4. Alerter si nécessaire
     if pct >= CHANGE_THRESHOLD:
-        print("🚨 Changement significatif détecté → envoi de l'alerte Discord")
+        print(" Changement significatif détecté → envoi de l'alerte Discord")
         send_discord_alert(pct, num_changed, before_img=reference_zone, after_img=current_zone)
     else:
-        print("✅ Pas de changement significatif — rien à signaler.")
+        print(" Pas de changement significatif — rien à signaler.")
 
     # 5. Sauvegarder la nouvelle référence pour le prochain run
     current_zone.save(REFERENCE_PATH)
-    print(f"💾 Nouvelle référence sauvegardée : {REFERENCE_PATH}")
+    print(f" Nouvelle référence sauvegardée : {REFERENCE_PATH}")
 
 
 if __name__ == "__main__":
     try:
         main()
     except Exception as exc:
-        print(f"❌ Erreur fatale : {exc}", file=sys.stderr)
+        print(f" Erreur fatale : {exc}", file=sys.stderr)
         sys.exit(1)
